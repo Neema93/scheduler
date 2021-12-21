@@ -22,7 +22,7 @@ export default function useVisualMode(initial) {
   }, []);
 
   const setDay = day => setState({ ...state, day });
-  const bookInterview = function (id, interview) {
+  const bookInterview = function (id, interview, mode, err) {
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
@@ -35,17 +35,22 @@ export default function useVisualMode(initial) {
 
     return axios.put(`/api/appointments/${id}`, { interview })
       .then((response) => {
-        const days = state.days.map(day => {
-          if (day.appointments.indexOf(id) > -1) {
-            day.spots = day.spots - 1;
-          }
-          return day;
-        })
-        setState({ ...state, appointments, days });
+        if (mode) {
+          const days = state.days.map(day => {
+            if (day.appointments.indexOf(id) > -1) {
+              day.spots = day.spots - 1;
+            }
+            return day;
+          })
+          setState({ ...state, appointments, days });
+          err(null);
+        }
+        setState({ ...state, appointments });
+        err(null);
       })
-      .catch((err) => console.log(err))
+      .catch((error) => err(error))
   }
-  function cancelInterview(id) {
+  function cancelInterview(id, err) {
     console.log('id delete', id);
     const appointment = {
       ...state.appointments[id],
@@ -63,9 +68,10 @@ export default function useVisualMode(initial) {
           }
           return day;
         })
-        setState({ ...state, appointments, days })
+        setState({ ...state, appointments, days });
+        err(null);
       })
-      .catch((err) => console.log(err))
+      .catch((error) => err(error))
   }
   return { state, setDay, bookInterview, cancelInterview };
 

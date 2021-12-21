@@ -18,7 +18,6 @@ const CONFIRM = "CONFIRM";
 const EDIT = "EDIT";
 const ERROR_SAVE = "ERROR_SAVE";
 const ERROR_DELETE = "ERROR_DELETE";
-
 export default function Appointment(props) {
   //get data from useVisualMode hook
   const { mode, transition, back } = useVisualMode(
@@ -30,19 +29,36 @@ export default function Appointment(props) {
       student: name,
       interviewer
     };
-    transition(SAVING);
-    props.bookInterview(props.id, interview)
-      .then(() => transition(SHOW))
-      .catch(error => transition(ERROR_SAVE, true));
+    if (mode === CREATE) {
+      transition(SAVING);
+      props.bookInterview(props.id, interview, CREATE, (err) => {
+        if (!err) {
+          transition(SHOW);
+          return;
+        }
+        transition(ERROR_SAVE, true);
+      })
+    } else {
+      transition(SAVING);
+      props.bookInterview(props.id, interview,(err) => {
+        if (!err) {
+          transition(SHOW);
+          return;
+        }
+        transition(ERROR_SAVE, true);
+      })
+    }
   }
   // delete function
   function deleting() {
     transition(DELETING, true);
-    props.cancelInterview(props.id)
-      .then((res) => {
-        transition(EMPTY)
-      })
-      .catch(error => transition(ERROR_DELETE, true));
+    props.cancelInterview(props.id, (err) => {
+      if (!err) {
+        transition(SHOW);
+        return;
+      }
+      transition(ERROR_DELETE, true);
+    })
   }
   // change mode when create somthing
   return (
@@ -62,8 +78,8 @@ export default function Appointment(props) {
       {mode === SAVING && <Status message={"Saving"} />}
       {mode === DELETING && <Status message={"deleting"} />}
       {mode === CONFIRM && <Confirm message={"Are you Sure Deleting interview?"} onCancel={() => back(SHOW)} onConfirm={deleting} />}
-      {mode === ERROR_SAVE && <Error message={"you are not able to save"} onClose={() => back(SHOW)} />}
-      {mode === ERROR_DELETE && <Error message={"you are not able to delete"} onClose={() => back(SHOW)} />}
+      {mode === ERROR_SAVE && <Error message={"you are not able to save"} onClose={back} />}
+      {mode === ERROR_DELETE && <Error message={"you are not able to delete"} onClose={back} />}
     </article>
   );
 }

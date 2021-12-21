@@ -1,5 +1,8 @@
 # Interview Scheduler
 
+Scheduler is a simple, single-page book interview,edit interview,delete interview.
+
+This repository is the starter code for the project:  fork and clone this repository, then build upon it to practice their JS, React, api-data.
 ## Setup
 
 Install dependencies with `npm install`.
@@ -26,3 +29,7 @@ npm test
 ```sh
 npm run storybook
 ```
+
+## Data fetch from 
+ Scheduler-api 
+
