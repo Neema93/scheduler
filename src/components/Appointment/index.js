@@ -40,7 +40,7 @@ export default function Appointment(props) {
       })
     } else {
       transition(SAVING);
-      props.bookInterview(props.id, interview,(err) => {
+      props.bookInterview(props.id, interview,null,(err) => {
         if (!err) {
           transition(SHOW);
           return;
@@ -54,7 +54,7 @@ export default function Appointment(props) {
     transition(DELETING, true);
     props.cancelInterview(props.id, (err) => {
       if (!err) {
-        transition(SHOW);
+        transition(EMPTY);
         return;
       }
       transition(ERROR_DELETE, true);

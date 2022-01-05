@@ -1,12 +1,14 @@
 import axios from "axios";
 const { useState, useEffect } = require("react");
 export default function useVisualMode(initial) {
+  // create state 
   const [state, setState] = useState({
     day: "Monday",
     days: [],
     appointments: {},
     interviews: {},
   });
+  // create server 
   useEffect(() => {
     Promise.all([
       axios.get(`http://localhost:8001/api/days`),
@@ -20,19 +22,18 @@ export default function useVisualMode(initial) {
         setState((state) => ({ ...state, days: dayData, appointments: appointmentData, interviewers: interviewData }));
       })
   }, []);
-
+// set day selected day 
   const setDay = day => setState({ ...state, day });
+  // book interview when create and update one 
   const bookInterview = function (id, interview, mode, err) {
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
     };
-
     const appointments = {
       ...state.appointments,
       [id]: appointment
     };
-
     return axios.put(`/api/appointments/${id}`, { interview })
       .then((response) => {
         if (mode) {
@@ -46,12 +47,14 @@ export default function useVisualMode(initial) {
           err(null);
         }
         setState({ ...state, appointments });
+        
         err(null);
       })
-      .catch((error) => err(error))
+      .catch(error => err(error))
   }
+  // cancelInterview for delete interview 
   function cancelInterview(id, err) {
-    console.log('id delete', id);
+   
     const appointment = {
       ...state.appointments[id],
       interview: null
